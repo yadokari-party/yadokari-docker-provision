@@ -65,6 +65,17 @@ services:
       interval: 5s
       retries: 20
 
+  tunnel:
+    restart: always
+    image: cloudflare/cloudflared
+    command: tunnel --no-autoupdate run
+    profiles:
+      - tunnel
+    env_file:
+      - .config/.env
+    networks:
+      - internal_network
+
 networks:
   internal_network:
   misskey-postgres:
