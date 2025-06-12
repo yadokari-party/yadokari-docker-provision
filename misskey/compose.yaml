@@ -1,0 +1,75 @@
+services:
+  proxy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    profiles:
+      - proxy
+    volumes:
+      - ./config/Caddyfile:/etc/caddy/Caddyfile
+      - ./config/certificate.pem:/etc/ssl/certs/certificate.pem
+      - ./config/key.pem:/etc/ssl/private/key.pem
+      - ./data/caddy/data:/data
+      - ./data/caddy/config:/config
+    networks:
+      - internal_network
+
+  app:
+    image: ghcr.io/yadokari-party/misskey:latest
+    restart: always
+#    environment:
+#      COREPACK_INTEGRITY_KEYS: 0
+    links:
+      - db
+      - keydb
+    depends_on:
+      db:
+        condition: service_healthy
+      keydb:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    networks:
+      - internal_network
+    volumes:
+      - ./config/default.yml:/misskey/config/default.yml:ro
+
+  keydb:
+    restart: always
+    image: eqalpha/keydb:alpine
+    networks:
+      - internal_network
+    volumes:
+      - ./data/keydb:/data
+    healthcheck:
+      test: "redis-cli ping"
+      interval: 5s
+      retries: 20
+
+  db:
+    restart: always
+    image: groonga/pgroonga:latest-debian-16
+    ports:
+      - '5430:5432'
+    networks:
+      internal_network:
+      misskey-postgres:
+          ipv4_address: 10.0.0.2
+    env_file:
+      - config/.env
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    healthcheck:
+      test: "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"
+      interval: 5s
+      retries: 20
+
+networks:
+  internal_network:
+  misskey-postgres:
+    external: true
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/27
