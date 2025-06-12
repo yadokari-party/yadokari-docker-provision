@@ -1,5 +1,5 @@
 yadokari.party {
-	tls /etc/ssl/certs/certificate.pem /etc/ssl/private/key.pem
+	tls internal 
 	encode gzip
 	header /assets Cache-Control "public, max-age=31536000, immutable" 
 	file_server
