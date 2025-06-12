@@ -57,7 +57,7 @@ services:
       misskey-postgres:
           ipv4_address: 10.0.0.2
     env_file:
-      - config/.env
+      - ./config/.env
     volumes:
       - ./data/db:/var/lib/postgresql/data
     healthcheck:
@@ -72,7 +72,7 @@ services:
     profiles:
       - tunnel
     env_file:
-      - .config/.env
+      - ./config/.env
     networks:
       - internal_network
 
