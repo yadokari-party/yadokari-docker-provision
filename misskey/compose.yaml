@@ -77,7 +77,7 @@ services:
     env_file:
       - ./config/.env
     healthcheck:
-      test: "curl --silent --fail https://localhost:9200/_cluster/health || exit 1"
+      test: "curl --silent --fail --insecure https://localhost:9200/_cluster/health || exit 1"
       interval: 5s
       timeout: 30s
       retries: 20
