@@ -72,8 +72,10 @@ services:
     #  - "9200:9200"
     environment:
       - discovery.type=single-node
-    env_file:
-      - ./config/.env
+      - plugins.security.ssl.http.enabled=true
+      - plugins.security.ssl.transport.enforce_hostname_verification=false
+    volumes:
+      - ./data/opensearch:/usr/share/opensearch/data
     networks:
       - internal_network
 
