@@ -213,7 +213,7 @@ fulltextSearch:
   # - meilisearch
   #   Use Meilisearch.
   #   You need to install Meilisearch and configure.
-  provider: sqlPgroonga
+  provider: elasticsearch
 
 # For Meilisearch settings.
 # If you select "meilisearch" for "fulltextSearch.provider", it must be set.
@@ -227,6 +227,22 @@ fulltextSearch:
 #  ssl: true
 #  index: ''
 #  scope: local
+
+# For Elasticsearch settings.
+# If you select "elasticsearch" for "fulltextSearch.provider", it must be set.
+# You can set scope to local (default value) or global
+# (include notes from remote).
+
+elasticsearch:
+  host: elasticsearch
+  port: 9200
+  username: admin
+  password: A1Y1vp4WQ0IqkFQGtBj4
+  ssl: true
+  index: 'yadokari'
+  scope: local
+  pingTimeout: 3000
+  requestTimeout: 30000
 
 #   ┌───────────────┐
 #───┘ ID generation └───────────────────────────────────────────

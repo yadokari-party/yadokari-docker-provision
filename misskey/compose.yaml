@@ -18,8 +18,8 @@ services:
   app:
     image: ghcr.io/yadokari-party/misskey:latest
     restart: always
-#    environment:
-#      COREPACK_INTEGRITY_KEYS: 0
+    #    environment:
+    #      COREPACK_INTEGRITY_KEYS: 0
     links:
       - db
       - keydb
@@ -27,6 +27,8 @@ services:
       db:
         condition: service_healthy
       keydb:
+        condition: service_healthy
+      opensearch:
         condition: service_healthy
     ports:
       - "3000:3000"
@@ -51,11 +53,11 @@ services:
     restart: always
     image: groonga/pgroonga:latest-debian-16
     ports:
-      - '5430:5432'
+      - "5430:5432"
     networks:
       internal_network:
       misskey-postgres:
-          ipv4_address: 10.0.0.2
+        ipv4_address: 10.0.0.2
     env_file:
       - ./config/.env
     volumes:
@@ -64,6 +66,32 @@ services:
       test: "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"
       interval: 5s
       retries: 20
+
+  opensearch:
+    restart: always
+    image: ghcr.io/chan-mai/elasticsearch-with-sudachi:latest
+    #ports:
+    #  - "9200:9200"
+    environment:
+      - discovery.type=single-node
+    healthcheck:
+      test: "curl --silent --fail localhost:9200/_cluster/health || exit 1"
+      interval: 5s
+      timeout: 30s
+      retries: 20
+    networks:
+      - internal_network
+
+  dashboard:
+    image: opensearchproject/opensearch-dashboards:2.19.2
+    environment:
+      OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
+    ports:
+      - 5601:5601
+    depends_on:
+      - opensearch
+    networks:
+      - internal_network
 
   tunnel:
     restart: always
