@@ -74,6 +74,8 @@ services:
       - discovery.type=single-node
       - plugins.security.ssl.http.enabled=true
       - plugins.security.ssl.transport.enforce_hostname_verification=false
+    env_file:
+      - ./config/.env
     volumes:
       - ./data/opensearch:/usr/share/opensearch/data
     networks:
