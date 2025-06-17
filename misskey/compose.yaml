@@ -74,6 +74,8 @@ services:
     #  - "9200:9200"
     environment:
       - discovery.type=single-node
+    env_file:
+      - ./config/.env
     healthcheck:
       test: "curl --silent --fail localhost:9200/_cluster/health || exit 1"
       interval: 5s
